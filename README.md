@@ -60,6 +60,29 @@ Requisição POST para escrita na rota de comentários do post.
   }
   ```
   
+* GET /consultation
+  ```
+  {
+    status: 200|404|500,
+    data: [
+      {
+        id: int,
+        title: string,
+        name: string,
+        img: string,
+        hashtags: [
+          {
+            id: int,
+            name: string
+          }
+        ]
+      },
+      ...
+    ]
+  }
+  ```
+
+
 * GET /shop
   ```
   {
