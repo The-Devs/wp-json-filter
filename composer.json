@@ -1,0 +1,29 @@
+{
+    "name": "thedevs/wordpress/my-json-view",
+    "description": "Wordpress plugin to fetch data from external REST API and render information about incoming JSON. This was developed thinking in CRUD operation at view level.",
+    "keywords": [],
+    "homepage": "https://thedevs.com.br/utils/wordpress/my-json-view",
+    "license": "GPL v3",
+    "authors": [
+        {
+            "name": "Enrique René",
+            "email": "enriquerene@thedevs.com.br",
+            "homepage": "https://thedevs.com.br/equipe/enriquerene"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": ">=4.8 < 6.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "mjsonv\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    }
+
+}
