@@ -92,3 +92,39 @@ add_action( 'rest_api_init', function () {
       'callback' => 'noIdQuery',
     ) );
   } );
+
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/consultation', array(
+      'methods' => 'GET',
+      'callback' => 'noIdQuery',
+    ) );
+  } );
+
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/shop', array(
+      'methods' => 'GET',
+      'callback' => 'noIdQuery',
+    ) );
+  } );
+
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<id>\d+)', array(
+      'methods' => 'GET',
+      'callback' => 'idQuery',
+    ) );
+  } );
+
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<id>\d+)/reviews', array(
+      'methods' => 'GET',
+      'callback' => 'idQuery',
+    ) );
+  } );
+
+add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<id>\d+)/reviews/(?P<id>\d+)', array(
+      'methods' => 'GET',
+      'callback' => 'idQuery',
+    ) );
+  } );
+
