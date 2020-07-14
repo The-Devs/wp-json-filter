@@ -66,65 +66,107 @@ if ( defined( "WP_CLI" ) && WP_CLI ) {
 	// require_once( MJSONV__PLUGIN_DIR . "class.mjsonv-cli.php" );
 }
 
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/blog/(?P<ID>\d+)', array(
+    'methods' => 'GET',
+    'callback' => 'idQuery',
+  ) );
+} );
+
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/blog', array(
+    'methods' => 'GET',
+    'callback' => 'noIdQuery',
+  ) );
+} );
+
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/consultation', array(
+    'methods' => 'GET',
+    'callback' => 'noIdQuery',
+  ) );
+} );
+
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/shop', array(
+    'methods' => 'GET',
+    'callback' => 'noIdQuery',
+  ) );
+} );
+
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)', array(
+    'methods' => 'GET',
+    'callback' => 'idQuery',
+  ) );
+} );
+
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)/reviews', array(
+    'methods' => 'GET',
+    'callback' => 'idQueryR',
+  ) );
+} );
+
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)/reviews/(?P<IDr>\d+)', array(
+    'methods' => 'GET',
+    'callback' => 'idQueryRID',
+  ) );
+} );
+
 function idQuery( $data ) {
-    $post_ID = $data['id'];
-    $sql = "SELECT * FROM 'devposts' WHERE ID = $post_ID";
-    $postData = mysql_query($sql);
-    return $postData;
+  $prefix = 'dev';
+  $username = 'plugin';
+  $password = 'plugin';
+  $pdo = new PDO('mysql:host=localhost;dbname=dev_plugin', $username, $password);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $post_ID = $data['ID'];
+  $sql = "SELECT * FROM {$prefix}posts WHERE ID = $post_ID";
+  $prepare = $pdo->prepare($sql);
+  $prepare->execute();
+  $result = $prepare->fetchall();
+  return $result;
+}
+
+function idQueryR( $data ) {
+  $prefix = 'dev';
+  $username = 'plugin';
+  $password = 'plugin';
+  $pdo = new PDO('mysql:host=localhost;dbname=dev_plugin', $username, $password);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $post_ID = $data['ID'];
+  $sql = "SELECT * FROM {$prefix}comments WHERE comment_post_ID = $post_ID";
+  $prepare = $pdo->prepare($sql);
+  $prepare->execute();
+  $result = $prepare->fetchall();
+  return $result;
+}
+
+function idQueryRID( $data ) {
+  $prefix = 'dev';
+  $username = 'plugin';
+  $password = 'plugin';
+  $pdo = new PDO('mysql:host=localhost;dbname=dev_plugin', $username, $password);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $comment_ID = $data['ID'];
+  $r_ID = $data['IDr'];
+  $sql = "SELECT * FROM {$prefix}comments WHERE comment_ID = $r_ID AND comment_post_ID = $comment_ID";
+  $prepare = $pdo->prepare($sql);
+  $prepare->execute();
+  $result = $prepare->fetchall();
+  return $result;
 }
 
 function noIdQuery( $data ) {
-    $sql = "SELECT * FROM 'devposts'";
-    $postData = mysql_query($sql);
-    return $postData;
+  $prefix = 'dev';
+  $username = 'plugin';
+  $password = 'plugin';
+  $pdo = new PDO('mysql:host=localhost;dbname=dev_plugin', $username, $password);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $sql = "SELECT * FROM {$prefix}posts";
+  $prepare = $pdo->prepare($sql);
+  $prepare->execute();
+  $result = $prepare->fetchall();
+  return $result;
 }
-
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/blog/(?P<id>\d+)', array(
-      'methods' => 'GET',
-      'callback' => 'idQuery',
-    ) );
-  } );
-
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/blog', array(
-      'methods' => 'GET',
-      'callback' => 'noIdQuery',
-    ) );
-  } );
-
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/consultation', array(
-      'methods' => 'GET',
-      'callback' => 'noIdQuery',
-    ) );
-  } );
-
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/shop', array(
-      'methods' => 'GET',
-      'callback' => 'noIdQuery',
-    ) );
-  } );
-
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<id>\d+)', array(
-      'methods' => 'GET',
-      'callback' => 'idQuery',
-    ) );
-  } );
-
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<id>\d+)/reviews', array(
-      'methods' => 'GET',
-      'callback' => 'idQuery',
-    ) );
-  } );
-
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<id>\d+)/reviews/(?P<id>\d+)', array(
-      'methods' => 'GET',
-      'callback' => 'idQuery',
-    ) );
-  } );
-
