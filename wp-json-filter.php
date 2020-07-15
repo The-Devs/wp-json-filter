@@ -43,18 +43,18 @@ function endpointsFactory () {
 	// Convocar uma add_action
 	// Essa add_action convoca todas as register_rest_route 
 }
-function mjsonv_plugin_activation () {
+function wpjsonfilter_plugin_activation () {
 	// O que estiver aqui acontece durante a ativação do plugin
 	// As endpoints devem ser criadas aqui
 }
-function mjsonv_plugin_deactivation () {
+function wpjsonfilter_plugin_deactivation () {
 	// O que estiver aqui acontece durante a desativação do plugin
 	// As endpoints devem ser destruídas aqui
 }
 
 // Registrando hooks de ativação e desativação
-register_activation_hook( WPJSONFILTER_ROOT_DIR, "mjsonv_plugin_activation" );
-register_deactivation_hook( WPJSONFILTER_ROOT_DIR, "mjsonv_plugin_deactivation" );
+register_activation_hook( WPJSONFILTER_ROOT_DIR, "wpjsonfilter_plugin_activation" );
+register_deactivation_hook( WPJSONFILTER_ROOT_DIR, "wpjsonfilter_plugin_deactivation" );
 
 
 if ( is_admin() || ( defined( "WP_CLI" ) && WP_CLI ) ) {
