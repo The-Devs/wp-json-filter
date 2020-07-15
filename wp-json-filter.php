@@ -87,14 +87,14 @@ add_action( 'rest_api_init', function () {
 add_action( 'rest_api_init', function () {
   register_rest_route( 'wp-json-filter/v1', '/consultation', array(
     'methods' => 'GET',
-    'callback' => 'noIdQuery',
+    'callback' => 'noIdQueryC',
   ) );
 } );
 
 add_action( 'rest_api_init', function () {
   register_rest_route( 'wp-json-filter/v1', '/shop', array(
     'methods' => 'GET',
-    'callback' => 'noIdQuery',
+    'callback' => 'noIdQueryS',
   ) );
 } );
 
@@ -137,6 +137,7 @@ function idQuery( $data ) {
   $prepare = $pdo->prepare($sql);
   $prepare->execute();
   $result = $prepare->fetchall();
+  $category = get_the_category( $post_ID );
   return $result;
 }
 
@@ -179,5 +180,53 @@ function noIdQuery( $data ) {
   $prepare = $pdo->prepare($sql);
   $prepare->execute();
   $result = $prepare->fetchall();
+  foreach( $result as $posts){
+    $postID = $posts["ID"];
+    $category = get_the_category( $postID );
+    foreach($category as $cd){  
+      $catNames = $cd->cat_name;
+    }
+    $result[]["category"] = $catNames;
+  }
+  return $result;
+}
+
+function noIdQueryC( $data ) {
+  $prefix = 'dev';
+  $username = 'plugin';
+  $password = 'plugin';
+  $pdo = new PDO('mysql:host=localhost;dbname=dev_plugin', $username, $password);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $sql = "SELECT * FROM {$prefix}posts";
+  $prepare = $pdo->prepare($sql);
+  $prepare->execute();
+  $result = $prepare->fetchall();
+  foreach( $result as $posts){
+    $postID = $posts["ID"];
+    $category = get_the_category( $postID );
+    foreach($category as $cd){  
+      $catNames = $cd->cat_name.'';
+    }
+  }
+  return $result;
+}
+
+function noIdQueryS( $data ) {
+  $prefix = 'dev';
+  $username = 'plugin';
+  $password = 'plugin';
+  $pdo = new PDO('mysql:host=localhost;dbname=dev_plugin', $username, $password);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  $sql = "SELECT * FROM {$prefix}posts";
+  $prepare = $pdo->prepare($sql);
+  $prepare->execute();
+  $result = $prepare->fetchall();
+  foreach( $result as $posts){
+    $postID = $posts["ID"];
+    $category = get_the_category( $postID );
+    foreach($category as $cd){  
+      $catNames = $cd->cat_name.'';
+    }
+  }
   return $result;
 }
