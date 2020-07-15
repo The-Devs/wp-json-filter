@@ -1,23 +1,24 @@
 <?php
 /**
- * @package My JSON View
+ * @package WP JSON Filter
  */
 /*
-Plugin Name: My JSON View
-Plugin URI: https://thedevs.com.br/utils/wordpress/mjsonv
-Description: My JSON View allows you to fetch data from external REST API and render specific JSON data in your own wordpress website. 
+Plugin Name: WP JSON Filter
+Plugin URI: https://github.com/The-Devs/wp-json-filter
+Description: WP JSON Filter is a WordPress plugin that adds new endpoints to the WP REST API. The goal of WP JSON Filter is to simplify the JSON interface of default WordPress routes, such as reading posts, for example.
 Version: 1.0.0
 Author: Enrique René
-Author URI: https://thedevs.com.br/equipe/enriquerene
-License: GPLv2 or later
-Text Domain: json-vue
+Author URI: https://enriquerene.com.br
+Developer: Yago Gomes
+Developer URI: https://github.com/yagocgomes
+License: GPLv3
+Text Domain: 
 */
 
 /*
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+as published by the Free Software Foundation; 
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,40 +32,43 @@ if ( ! function_exists( 'add_action' ) ) {
 	exit;
 }
 
-define( "MJSONV_VERSION", "1.0.0" );
-define( "MJSONV_MINIMUM_WP_VERSION", "5.4" );
-define( "MJSONV_ROOT_DIR", __FILE__ );
-define( "MJSONV_PLUGIN_DIR", plugin_dir_path( __FILE__ ) );
-define( "MJSONV_FUNCTIONS_DIR", MJSONV_PLUGIN_DIR );
+define( "WPJSONFILTER_VERSION", "1.0.0" );
+define( "WPJSONFILTER_MINIMUM_WP_VERSION", "5.4" );
+define( "WPJSONFILTER_ROOT_DIR", __FILE__ );
+define( "WPJSONFILTER_PLUGIN_DIR", plugin_dir_path( __FILE__ ) );
 
-define( "MJSONV_ROOT_PATH", "/wp-content/plugins/my-json-view/" );
-define( "MJSONV_VIEWS_PATH", MJSONV_ROOT_PATH . "views" . DIRECTORY_SEPARATOR );
+define( "WPJSONFILTER_ROOT_PATH", "/wp-content/plugins/wp-json-filter/" );
 
-define( "MJSONV_FRONT_SLUG", "mjsonv" );
-define( "MJSONV_FRONT_TITLE", "My JSON View" );
-define( "MJSONV_FRONT_ID", "mjsonv" );
+function endpointsFactory () {
+	// Convocar uma add_action
+	// Essa add_action convoca todas as register_rest_route 
+}
+function mjsonv_plugin_activation () {
+	// O que estiver aqui acontece durante a ativação do plugin
+	// As endpoints devem ser criadas aqui
+}
+function mjsonv_plugin_deactivation () {
+	// O que estiver aqui acontece durante a desativação do plugin
+	// As endpoints devem ser destruídas aqui
+}
 
-define( "MJSONV_DEFAULT_URL", "https://jsonplaceholder.typicode.com/users" );
-define( "MJSONV_DEFAULT_SINGLE_URL_ATTRIBUTE", "id" );
-define( "MJSONV_DEFAULT_ATTRIBUTES", "id,name,username" );
+// Registrando hooks de ativação e desativação
+register_activation_hook( WPJSONFILTER_ROOT_DIR, "mjsonv_plugin_activation" );
+register_deactivation_hook( WPJSONFILTER_ROOT_DIR, "mjsonv_plugin_deactivation" );
 
-require_once( MJSONV_PLUGIN_DIR . "class.mjsonv.php" );
-require_once( MJSONV_FUNCTIONS_DIR . "functions.php" );
-
-register_activation_hook( MJSONV_ROOT_DIR, "mjsonv_plugin_activation" );
-register_deactivation_hook( MJSONV_ROOT_DIR, "mjsonv_plugin_deactivation" );
-
-add_action( "wp_enqueue_scripts", "mjsonv_init" );
-add_shortcode( 'mjsonv', 'mjsonv_build_app' );
 
 if ( is_admin() || ( defined( "WP_CLI" ) && WP_CLI ) ) {
-	// require_once( MJSONV_PLUGIN_DIR . "class.mjsonv-admin.php" );
-	// add_action( "init", array( "Akismet_Admin", "init" ) );
+	// For customizitaion page in admin area
+}
+if ( defined( "WP_CLI" ) && WP_CLI ) {
+	// For customizitaion page via CLI interface
 }
 
-if ( defined( "WP_CLI" ) && WP_CLI ) {
-	// require_once( MJSONV__PLUGIN_DIR . "class.mjsonv-cli.php" );
-}
+/*
+	SUGESTÃO
+	uma função que faz todos os add_actions de uma vez só.
+	Chamei essa função de endpointsFactory
+*/
 
 add_action( 'rest_api_init', function () {
   register_rest_route( 'wp-json-filter/v1', '/blog/(?P<ID>\d+)', array(
@@ -114,6 +118,13 @@ add_action( 'rest_api_init', function () {
     'callback' => 'idQueryRID',
   ) );
 } );
+
+
+/*
+	SUGESTÃO
+	É muito mais seguro e estável usar a interface de banco de dados do próprio WP.
+	Veja um exemplo de como fazer isso no arquivo functions.php (só mantive o arquivo para voce ver como usar a interface. Depois pode apagar.)
+*/
 
 function idQuery( $data ) {
   $prefix = 'dev';
