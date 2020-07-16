@@ -146,14 +146,6 @@ Requisição POST para escrita na rota de comentários do post.
         content: string,
         title: string,
         name: string,
-        excerpt: string,
-        img: string,
-        hashtags: [
-          {
-            id: int,
-            name: string
-          }
-        ]
       },
       ...
     ]
