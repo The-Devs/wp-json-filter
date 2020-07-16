@@ -137,7 +137,8 @@ function idQuery( $data ) {
   $prepare = $pdo->prepare($sql);
   $prepare->execute();
   $result = $prepare->fetchall();
-  $category = get_the_category( $post_ID );
+  $tags = get_the_tags( $post_ID );
+  $result["tags"] = $tags;
   return $result;
 }
 
@@ -152,6 +153,8 @@ function idQueryR( $data ) {
   $prepare = $pdo->prepare($sql);
   $prepare->execute();
   $result = $prepare->fetchall();
+  $tags = get_the_tags( $post_ID );
+  $result["tags"] = $tags;
   return $result;
 }
 
@@ -188,7 +191,7 @@ function noIdQuery( $data ) {
     //}
     //$result[]["category"] = $catNames;
   //}
-  $args = array( 'category_name' => 'Artigos e dicas' );
+  $args = array( 'category_name' => 'dicas' );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
     $post_ID = $posts->ID;
