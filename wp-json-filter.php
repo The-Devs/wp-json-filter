@@ -138,7 +138,12 @@ function idQuery( $data ) {
   $prepare->execute();
   $result = $prepare->fetchall();
   $tags = get_the_tags( $post_ID );
-  $result["tags"] = $tags;
+  foreach ($tags as $hashtags){
+    $tag[] = array(
+      "id" => $hashtags->term_id,
+      "name" => $hashtags->name
+    );
+  };
   $res = array(
     "status" => 200,
     "data" => array (
@@ -149,10 +154,7 @@ function idQuery( $data ) {
       "name" => $result[0]["post_name"],
       "excerpt" => $result[0]["post_excerpt"],
       "img" => $result[0]["post_img"],
-      "hashtags" => array(
-          "id" => $tags["ID"],
-          "name"=> $tags["name"]
-      )
+      "hashtags" => $tag
     )
   );
   return $res;
@@ -169,9 +171,28 @@ function idQueryR( $data ) {
   $prepare = $pdo->prepare($sql);
   $prepare->execute();
   $result = $prepare->fetchall();
-  $tags = get_the_tags( $post_ID );
-  $result["tags"] = $tags;
-  return $result;
+  foreach ($result as $response){
+    $tags = get_the_tags( $post_ID );
+    foreach ($tags as $hashtags){
+      $tag[] = array(
+        "id" => $hashtags->term_id,
+        "name" => $hashtags->name
+      );
+    };
+    $res[] = array(
+      "status" => 200,
+      "pageSize"=> 10,
+      "page"=> 1,
+      "data" => array (
+      "id" => $response["comment_ID"],
+      "date" => $response["comment_date"],
+      "content" => $response["comment_content"],
+      "name" => $response["comment_author"],
+      "hashtags" => $tag
+      )
+    );
+  }
+  return $res;
 }
 
 function idQueryRID( $data ) {
@@ -186,27 +207,31 @@ function idQueryRID( $data ) {
   $prepare = $pdo->prepare($sql);
   $prepare->execute();
   $result = $prepare->fetchall();
-  return $result;
+  foreach ($result as $response){
+    $tags = get_the_tags( $comment_ID );
+    foreach ($tags as $hashtags){
+      $tag[] = array(
+        "id" => $hashtags->term_id,
+        "name" => $hashtags->name
+      );
+    };
+    $res[] = array(
+      "status" => 200,
+      "pageSize"=> 10,
+      "page"=> 1,
+      "data" => array (
+      "id" => $response["comment_ID"],
+      "date" => $response["comment_date"],
+      "content" => $response["comment_content"],
+      "name" => $response["comment_author"],
+      "hashtags" => $tag
+      )
+    );
+  }
+  return $res;
 }
 
 function noIdQuery( $data ) {
-  //$prefix = 'dev';
-  //$username = 'plugin';
-  //$password = 'plugin';
-  //$pdo = new PDO('mysql:host=localhost;dbname=dev_plugin', $username, $password);
-  //$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  //$sql = "SELECT * FROM {$prefix}posts";
-  //$prepare = $pdo->prepare($sql);
-  //$prepare->execute();
-  //$result = $prepare->fetchall();
-  //foreach( $result as $posts){
-    //$postID = $posts["ID"];
-    //$category = get_the_category( $postID );
-    //foreach($category as $cd){  
-      //$catNames = $cd->cat_name;
-    //}
-    //$result[]["category"] = $catNames;
-  //}
   $args = array( 'category_name' => 'dicas' );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
@@ -243,22 +268,6 @@ function noIdQuery( $data ) {
 }
 
 function noIdQueryC( $data ) {
-//  $prefix = 'dev';
-//  $username = 'plugin';
-//  $password = 'plugin';
-//  $pdo = new PDO('mysql:host=localhost;dbname=dev_plugin', $username, $password);
-//  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-//  $sql = "SELECT * FROM {$prefix}posts";
-//  $prepare = $pdo->prepare($sql);
-//  $prepare->execute();
-//  $result = $prepare->fetchall();
-//  foreach( $result as $posts){
-//    $postID = $posts["ID"];
-//    $category = get_the_category( $postID );
-//    foreach($category as $cd){  
-//      $catNames = $cd->cat_name.'';
-//    }
-//  }
   $args = array( 'category_name' => 'Questionario' );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
@@ -267,26 +276,30 @@ function noIdQueryC( $data ) {
     $posts->tags = $tags;
     $result[] = $posts;
   };
-  return $result;
+  foreach ($result as $response){
+    $nHashtag = $response->tags;
+    foreach ($nHashtag as $hashtags){
+      $tag[] = array(
+        "id" => $hashtags->term_id,
+        "name" => $hashtags->name
+      );
+    };
+  $res[] = array(
+    "status" => 200,
+    "data" => array (
+    "id" => $response->ID,
+    "title" => $response->post_title,
+    "name" => $response->post_name,
+    "img" => $response->post_img,
+    "IsMulti" => 0,
+    "hashtags" => $tag
+    )
+  );
+}
+  return $res;
 }
 
 function noIdQueryS( $data ) {
-//  $prefix = 'dev';
-//  $username = 'plugin';
-//  $password = 'plugin';
-//  $pdo = new PDO('mysql:host=localhost;dbname=dev_plugin', $username, $password);
-//  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-//  $sql = "SELECT * FROM {$prefix}posts";
-//  $prepare = $pdo->prepare($sql);
-//  $prepare->execute();
-//  $result = $prepare->fetchall();
-//  foreach( $result as $posts){
-//    $postID = $posts["ID"];
-//    $category = get_the_category( $postID );
-//    foreach($category as $cd){  
-//      $catNames = $cd->cat_name.'';
-//    }
-// }
   $args = array( 'category_name' => 'Produto' );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
@@ -295,5 +308,29 @@ function noIdQueryS( $data ) {
     $posts->tags = $tags;
     $result[] = $posts;
   };
-  return $result;
+  foreach ($result as $response){
+    $nHashtag = $response->tags;
+    foreach ($nHashtag as $hashtags){
+      $tag[] = array(
+        "id" => $hashtags->term_id,
+        "name" => $hashtags->name
+      );
+    };
+    $res[] = array(
+      "status" => 200,
+      "pageSize"=> 10,
+      "page"=> 1,
+      "data" => array (
+      "id" => $response->ID,
+      "date" => $response->post_date,
+      "content" => $response->post_content,
+      "title" => $response->post_title,
+      "name" => $response->post_name,
+      "excerpt" => $response->post_excerpt,
+      "img" => $response->post_img,
+      "hashtags" => $tag
+      )
+    );
+  }
+  return $res;
 }
