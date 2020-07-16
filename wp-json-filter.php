@@ -138,6 +138,7 @@ function idQuery( $data ) {
   $prepare->execute();
   $result = $prepare->fetchall();
   $tags = get_the_tags( $post_ID );
+  $img = get_the_post_thumbnail_url( $post_ID );
   foreach ($tags as $hashtags){
     $tag[] = array(
       "id" => $hashtags->term_id,
@@ -153,7 +154,7 @@ function idQuery( $data ) {
       "title" => $result[0]["post_title"],
       "name" => $result[0]["post_name"],
       "excerpt" => $result[0]["post_excerpt"],
-      "img" => $result[0]["post_img"],
+      "img" => $img,
       "hashtags" => $tag
     )
   );
@@ -236,8 +237,10 @@ function noIdQuery( $data ) {
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
     $post_ID = $posts->ID;
+    $img = get_the_post_thumbnail_url( $post_ID );
     $tags = get_the_tags($post_ID);
     $posts->tags = $tags;
+    $posts->img = $img;
     $result[] = $posts;
   };
   foreach ($result as $response){
@@ -259,7 +262,7 @@ function noIdQuery( $data ) {
       "title" => $response->post_title,
       "name" => $response->post_name,
       "excerpt" => $response->post_excerpt,
-      "img" => $response->post_img,
+      "img" => $response->img,
       "hashtags" => $tag
       )
     );
@@ -273,6 +276,8 @@ function noIdQueryC( $data ) {
   foreach($myposts as $posts){
     $post_ID = $posts->ID;
     $tags = get_the_tags($post_ID);
+    $img = get_the_post_thumbnail_url( $post_ID );
+    $posts->img = $img;
     $posts->tags = $tags;
     $result[] = $posts;
   };
@@ -290,7 +295,7 @@ function noIdQueryC( $data ) {
     "id" => $response->ID,
     "title" => $response->post_title,
     "name" => $response->post_name,
-    "img" => $response->post_img,
+    "img" => $response->img,
     "IsMulti" => 0,
     "hashtags" => $tag
     )
@@ -306,6 +311,8 @@ function noIdQueryS( $data ) {
     $post_ID = $posts->ID;
     $tags = get_the_tags($post_ID);
     $posts->tags = $tags;
+    $img = get_the_post_thumbnail_url( $post_ID );
+    $posts->img = $img;
     $result[] = $posts;
   };
   foreach ($result as $response){
@@ -327,7 +334,7 @@ function noIdQueryS( $data ) {
       "title" => $response->post_title,
       "name" => $response->post_name,
       "excerpt" => $response->post_excerpt,
-      "img" => $response->post_img,
+      "img" => $response->img,
       "hashtags" => $tag
       )
     );
