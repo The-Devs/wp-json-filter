@@ -139,7 +139,23 @@ function idQuery( $data ) {
   $result = $prepare->fetchall();
   $tags = get_the_tags( $post_ID );
   $result["tags"] = $tags;
-  return $result;
+  $res = array(
+    "status" => 200,
+    "data" => array (
+      "id" => $post_ID,
+      "date" => $result[0]["post_date"],
+      "content" => $result[0]["post_content"],
+      "title" => $result[0]["post_title"],
+      "name" => $result[0]["post_name"],
+      "excerpt" => $result[0]["post_excerpt"],
+      "img" => $result[0]["post_img"],
+      "hashtags" => array(
+          "id" => $tags["ID"],
+          "name"=> $tags["name"]
+      )
+    )
+  );
+  return $res;
 }
 
 function idQueryR( $data ) {
@@ -199,7 +215,31 @@ function noIdQuery( $data ) {
     $posts->tags = $tags;
     $result[] = $posts;
   };
-  return $result;
+  foreach ($result as $response){
+    $nHashtag = $response->tags;
+    foreach ($nHashtag as $hashtags){
+      $tag[] = array(
+        "id" => $hashtags->term_id,
+        "name" => $hashtags->name
+      );
+    };
+    $res[] = array(
+      "status" => 200,
+      "pageSize"=> 10,
+      "page"=> 1,
+      "data" => array (
+      "id" => $response->ID,
+      "date" => $response->post_date,
+      "content" => $response->post_content,
+      "title" => $response->post_title,
+      "name" => $response->post_name,
+      "excerpt" => $response->post_excerpt,
+      "img" => $response->post_img,
+      "hashtags" => $tag
+      )
+    );
+  }
+  return $res;
 }
 
 function noIdQueryC( $data ) {
