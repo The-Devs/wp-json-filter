@@ -41,11 +41,60 @@ define( "WPJSONFILTER_ROOT_PATH", "/wp-content/plugins/wp-json-filter/" );
 
 function endpointsFactory () {
 	// Convocar uma add_action
-	// Essa add_action convoca todas as register_rest_route 
+  // Essa add_action convoca todas as register_rest_route 
+  add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/blog/(?P<ID>\d+)', array(
+      'methods' => 'GET',
+      'callback' => 'idQuery',
+    ) );
+  } );
+  
+  add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/blog', array(
+      'methods' => 'GET',
+      'callback' => 'noIdQuery',
+    ) );
+  } );
+  
+  add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/consultation', array(
+      'methods' => 'GET',
+      'callback' => 'noIdQueryC',
+    ) );
+  } );
+  
+  add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/shop', array(
+      'methods' => 'GET',
+      'callback' => 'noIdQueryS',
+    ) );
+  } );
+  
+  add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)', array(
+      'methods' => 'GET',
+      'callback' => 'idQuery',
+    ) );
+  } );
+  
+  add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)/reviews', array(
+      'methods' => 'GET',
+      'callback' => 'idQueryR',
+    ) );
+  } );
+  
+  add_action( 'rest_api_init', function () {
+    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)/reviews/(?P<IDr>\d+)', array(
+      'methods' => 'GET',
+      'callback' => 'idQueryRID',
+    ) );
+  } );
 }
 function wpjsonfilter_plugin_activation () {
 	// O que estiver aqui acontece durante a ativação do plugin
-	// As endpoints devem ser criadas aqui
+  // As endpoints devem ser criadas aqui
+  endpointsFactory();
 }
 function wpjsonfilter_plugin_deactivation () {
 	// O que estiver aqui acontece durante a desativação do plugin
@@ -70,54 +119,7 @@ if ( defined( "WP_CLI" ) && WP_CLI ) {
 	Chamei essa função de endpointsFactory
 */
 
-add_action( 'rest_api_init', function () {
-  register_rest_route( 'wp-json-filter/v1', '/blog/(?P<ID>\d+)', array(
-    'methods' => 'GET',
-    'callback' => 'idQuery',
-  ) );
-} );
 
-add_action( 'rest_api_init', function () {
-  register_rest_route( 'wp-json-filter/v1', '/blog', array(
-    'methods' => 'GET',
-    'callback' => 'noIdQuery',
-  ) );
-} );
-
-add_action( 'rest_api_init', function () {
-  register_rest_route( 'wp-json-filter/v1', '/consultation', array(
-    'methods' => 'GET',
-    'callback' => 'noIdQueryC',
-  ) );
-} );
-
-add_action( 'rest_api_init', function () {
-  register_rest_route( 'wp-json-filter/v1', '/shop', array(
-    'methods' => 'GET',
-    'callback' => 'noIdQueryS',
-  ) );
-} );
-
-add_action( 'rest_api_init', function () {
-  register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)', array(
-    'methods' => 'GET',
-    'callback' => 'idQuery',
-  ) );
-} );
-
-add_action( 'rest_api_init', function () {
-  register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)/reviews', array(
-    'methods' => 'GET',
-    'callback' => 'idQueryR',
-  ) );
-} );
-
-add_action( 'rest_api_init', function () {
-  register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)/reviews/(?P<IDr>\d+)', array(
-    'methods' => 'GET',
-    'callback' => 'idQueryRID',
-  ) );
-} );
 
 
 /*
