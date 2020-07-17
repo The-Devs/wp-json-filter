@@ -133,7 +133,7 @@ Requisição POST para escrita na rota de comentários do post.
   }
   ```
   
-* GET /blog/{id}/reviews
+* GET /shop/{id}/reviews
   ```
   {
     status: 200|404|500,
@@ -146,25 +146,17 @@ Requisição POST para escrita na rota de comentários do post.
         content: string,
         title: string,
         name: string,
-        excerpt: string,
-        img: string,
-        hashtags: [
-          {
-            id: int,
-            name: string
-          }
-        ]
       },
       ...
     ]
   }
   ```
  
- * POST /blog/{id}/reviews
+ * POST /shop/{id}/reviews
   ```
   {
-    status: 200|404|500,
-    data: {
+    status: 201|404|500, // ATENÇÃO, por ser POST se o registro no db ocorreer de forma bem sucedida deve retornar 201 (não 200)
+    data: { // id, date e name do registro inserido
       id: int,
       date: string,
       name: string
