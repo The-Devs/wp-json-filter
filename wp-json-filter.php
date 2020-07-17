@@ -39,57 +39,11 @@ define( "WPJSONFILTER_PLUGIN_DIR", plugin_dir_path( __FILE__ ) );
 
 define( "WPJSONFILTER_ROOT_PATH", "/wp-content/plugins/wp-json-filter/" );
 
+define ('pageSize', 10); //define quantas páginas são mostradas
+
 function endpointsFactory () {
 	// Convocar uma add_action
   // Essa add_action convoca todas as register_rest_route 
-  add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/blog/(?P<ID>\d+)', array(
-      'methods' => 'GET',
-      'callback' => 'idQuery',
-    ) );
-  } );
-  
-  add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/blog', array(
-      'methods' => 'GET',
-      'callback' => 'noIdQuery',
-    ) );
-  } );
-  
-  add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/consultation', array(
-      'methods' => 'GET',
-      'callback' => 'noIdQueryC',
-    ) );
-  } );
-  
-  add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/shop', array(
-      'methods' => 'GET',
-      'callback' => 'noIdQueryS',
-    ) );
-  } );
-  
-  add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)', array(
-      'methods' => 'GET',
-      'callback' => 'idQuery',
-    ) );
-  } );
-  
-  add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)/reviews', array(
-      'methods' => 'GET',
-      'callback' => 'idQueryR',
-    ) );
-  } );
-  
-  add_action( 'rest_api_init', function () {
-    register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)/reviews/(?P<IDr>\d+)', array(
-      'methods' => 'GET',
-      'callback' => 'idQueryRID',
-    ) );
-  } );
 }
 function wpjsonfilter_plugin_activation () {
 	// O que estiver aqui acontece durante a ativação do plugin
@@ -118,15 +72,60 @@ if ( defined( "WP_CLI" ) && WP_CLI ) {
 	uma função que faz todos os add_actions de uma vez só.
 	Chamei essa função de endpointsFactory
 */
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/blog/(?P<ID>\d+)', array(
+    'methods' => 'GET',
+    'callback' => 'idQuery',
+  ) );
+} );
 
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/blog', array(
+    'methods' => 'GET',
+    'callback' => 'noIdQuery',
+  ) );
+} );
 
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/consultation', array(
+    'methods' => 'GET',
+    'callback' => 'noIdQueryC',
+  ) );
+} );
 
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/shop', array(
+    'methods' => 'GET',
+    'callback' => 'noIdQueryS',
+  ) );
+} );
 
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)', array(
+    'methods' => 'GET',
+    'callback' => 'idQuery',
+  ) );
+} );
+
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)/reviews', array(
+    'methods' => 'GET',
+    'callback' => 'idQueryR',
+  ) );
+} );
+
+add_action( 'rest_api_init', function () {
+  register_rest_route( 'wp-json-filter/v1', '/shop/(?P<ID>\d+)/reviews/(?P<IDr>\d+)', array(
+    'methods' => 'GET',
+    'callback' => 'idQueryRID',
+  ) );
+} );
 /*
 	SUGESTÃO
 	É muito mais seguro e estável usar a interface de banco de dados do próprio WP.
 	Veja um exemplo de como fazer isso no arquivo functions.php (só mantive o arquivo para voce ver como usar a interface. Depois pode apagar.)
 */
+
 
 function idQuery( $data ) {
   $prefix = 'dev';
@@ -190,7 +189,7 @@ function idQueryR( $data ) {
     };
     $res[] = array(
       "status" => 200,
-      "pageSize"=> 10,
+      "pageSize"=> pageSize,
       "page"=> 1,
       "data" => array (
       "id" => $response["comment_ID"],
@@ -226,8 +225,6 @@ function idQueryRID( $data ) {
     };
     $res[] = array(
       "status" => 200,
-      "pageSize"=> 10,
-      "page"=> 1,
       "data" => array (
       "id" => $response["comment_ID"],
       "date" => $response["comment_date"],
@@ -241,7 +238,9 @@ function idQueryRID( $data ) {
 }
 
 function noIdQuery( $data ) {
-  $args = array( 'category_name' => 'dicas' );
+  $paged = (get_query_var('paged')) ? get_query_var('paged') : 0;
+  $postOffset = $paged * pageSize;
+  $args = array( 'category_name' => 'dicas', 'numberposts' => pageSize, 'offset' => $postOffset  );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
     $post_ID = $posts->ID;
@@ -261,8 +260,8 @@ function noIdQuery( $data ) {
     };
     $res[] = array(
       "status" => 200,
-      "pageSize"=> 10,
-      "page"=> 1,
+      "pageSize"=> $args['numberposts'],
+      "page"=> $args['offset'],
       "data" => array (
       "id" => $response->ID,
       "date" => $response->post_date,
@@ -279,7 +278,7 @@ function noIdQuery( $data ) {
 }
 
 function noIdQueryC( $data ) {
-  $args = array( 'category_name' => 'Questionario' );
+  $args = array( 'category_name' => 'Questionario');
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
     $post_ID = $posts->ID;
@@ -313,7 +312,9 @@ function noIdQueryC( $data ) {
 }
 
 function noIdQueryS( $data ) {
-  $args = array( 'category_name' => 'Produto' );
+  $paged = (get_query_var('paged')) ? get_query_var('paged') : 0;
+  $postOffset = $paged * pageSize;
+  $args = array( 'category_name' => 'Produto', 'numberposts' => pageSize, 'offset' => $postOffset    );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
     $post_ID = $posts->ID;
@@ -333,8 +334,8 @@ function noIdQueryS( $data ) {
     };
     $res[] = array(
       "status" => 200,
-      "pageSize"=> 10,
-      "page"=> 1,
+      "pageSize"=> $args['numberposts'],
+      "page"=>  $args['offset'],
       "data" => array (
       "id" => $response->ID,
       "date" => $response->post_date,
