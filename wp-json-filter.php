@@ -160,6 +160,12 @@ function idQuery( $data ) {
   return $res;
 }
 
+// Para as funções que com instância PDO
+// mudar $pdo = new ...
+// para $pdo = getPDOInstance()
+//
+// function getPDOInstance () return new PDO ...
+//
 function idQueryR( $data ) {
   $prefix = 'dev';
   $username = 'plugin';
