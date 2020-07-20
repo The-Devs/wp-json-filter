@@ -36,7 +36,7 @@ define( "WPJSONFILTER_VERSION", "1.0.0" );
 define( "WPJSONFILTER_MINIMUM_WP_VERSION", "5.4" );
 define( "WPJSONFILTER_ROOT_DIR", __FILE__ );
 define( "WPJSONFILTER_PLUGIN_DIR", plugin_dir_path( __FILE__ ) );
-
+define ( "_MAX_PER_PAGE", 10);
 define( "WPJSONFILTER_ROOT_PATH", "/wp-content/plugins/wp-json-filter/" );
 
 define ('pageSize', 10); //define quantas páginas são mostradas
@@ -169,13 +169,16 @@ function idQuery( $data ) {
 // function getPDOInstance () return new PDO ...
 //
 function idQueryR( $data ) {
+  $maxPerPage = 1;
+  $page = 1;
+  $offSet = $maxPerPage * ( $page - 1 );
   $prefix = 'dev';
   $username = 'plugin';
   $password = 'plugin';
   $pdo = new PDO('mysql:host=localhost;dbname=dev_plugin', $username, $password);
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
   $post_ID = $data['ID'];
-  $sql = "SELECT * FROM {$prefix}comments WHERE comment_post_ID = $post_ID";
+  $sql = "SELECT * FROM {$prefix}comments WHERE comment_post_ID = $post_ID LIMIT $maxPerPage OFFSET $offSet";
   $prepare = $pdo->prepare($sql);
   $prepare->execute();
   $result = $prepare->fetchall();
@@ -190,7 +193,7 @@ function idQueryR( $data ) {
     $res[] = array(
       "status" => 200,
       "pageSize"=> pageSize,
-      "page"=> 1,
+      "page"=> $page,
       "data" => array (
       "id" => $response["comment_ID"],
       "date" => $response["comment_date"],
@@ -238,8 +241,8 @@ function idQueryRID( $data ) {
 }
 
 function noIdQuery( $data ) {
-  $paged = (get_query_var('paged')) ? get_query_var('paged') : 0;
-  $postOffset = $paged * pageSize;
+  $page = $pageFromQueryParam ?? 1 ;
+  $postOffset = $pageSize * ( $page - 1 );
   $args = array( 'category_name' => 'dicas', 'numberposts' => pageSize, 'offset' => $postOffset  );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
@@ -312,8 +315,8 @@ function noIdQueryC( $data ) {
 }
 
 function noIdQueryS( $data ) {
-  $paged = (get_query_var('paged')) ? get_query_var('paged') : 0;
-  $postOffset = $paged * pageSize;
+  $page = $pageFromQueryParam ?? 1 ;
+  $postOffset = $pageSize * ( $page - 1 );
   $args = array( 'category_name' => 'Produto', 'numberposts' => pageSize, 'offset' => $postOffset    );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
