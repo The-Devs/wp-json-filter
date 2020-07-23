@@ -161,7 +161,7 @@ function idQueryR( $data ) {
     };
     $res[] = array(
       "status" => 200,
-      "pageSize"=> WPJSONFILTER_PAGE_SIZE,
+      "pageSize"=> WPJSONFILTER_DEFAULT_PAGE_SIZE,
       "page"=> $page,
       "data" => array (
       "id" => $response["comment_ID"],
@@ -222,7 +222,7 @@ function noIdQuery( $data ) {
     $treatedQuery = "";
   }
   $queryArgs = implode(", ",$treatedQuery);
-  $args = array( 'category_name' => 'dicas', 'numberposts' => WPJSONFILTER_PAGE_SIZE, 'offset' => $postOffset, $queryArgs );
+  $args = array( 'category_name' => 'dicas', 'numberposts' => WPJSONFILTER_DEFAULT_PAGE_SIZE, 'offset' => $postOffset, $queryArgs );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
     $post_ID = $posts->ID;
@@ -299,7 +299,7 @@ function noIdQueryS( $data ) {
   $page = $pageFromQueryParam ?? WPJSONFILTER_DEFAULT_PAGE ;
   $postOffset = $pageSize * ( $page - 1 );
 
-  $args = array( 'category_name' => 'produto', 'numberposts' => WPJSONFILTER_PAGE_SIZE, 'offset' => $postOffset );
+  $args = array( 'category_name' => 'produto', 'numberposts' => WPJSONFILTER_DEFAULT_PAGE_SIZE, 'offset' => $postOffset );
   $myposts = get_posts( $args );
 
   if ( ! empty( $myposts ) )
@@ -321,11 +321,12 @@ function noIdQueryS( $data ) {
 			  "img" => get_the_post_thumbnail_url( $post->ID ),
 			  "tags" => $tags
 		  );
+		  unset( $tags );
 	  };
 	  $res = array(
 		  "status" => 200,
 		  "pageSize"=> $args['numberposts'],
-		  "page"=>  $args['offset'],
+		  "page"=>  $page,
 		  "data" => $result
 	  );
   }
