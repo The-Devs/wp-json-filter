@@ -36,29 +36,10 @@ define( "WPJSONFILTER_VERSION", "1.0.0" );
 define( "WPJSONFILTER_MINIMUM_WP_VERSION", "5.4" );
 define( "WPJSONFILTER_ROOT_DIR", __FILE__ );
 define( "WPJSONFILTER_PLUGIN_DIR", plugin_dir_path( __FILE__ ) );
-define ( "_MAX_PER_PAGE", 10);
 define( "WPJSONFILTER_ROOT_PATH", "/wp-content/plugins/wp-json-filter/" );
-
-define ('pageSize', 10); //define quantas páginas são mostradas
-
-function endpointsFactory () {
-	// Convocar uma add_action
-  // Essa add_action convoca todas as register_rest_route 
-}
-function wpjsonfilter_plugin_activation () {
-	// O que estiver aqui acontece durante a ativação do plugin
-  // As endpoints devem ser criadas aqui
-  endpointsFactory();
-}
-function wpjsonfilter_plugin_deactivation () {
-	// O que estiver aqui acontece durante a desativação do plugin
-	// As endpoints devem ser destruídas aqui
-}
-
-// Registrando hooks de ativação e desativação
-register_activation_hook( WPJSONFILTER_ROOT_DIR, "wpjsonfilter_plugin_activation" );
-register_deactivation_hook( WPJSONFILTER_ROOT_DIR, "wpjsonfilter_plugin_deactivation" );
-
+define ( 'WPJSONFILTER_DEFAULT_PAGE_SIZE', 10 );
+define ( 'WPJSONFILTER_DEFAULT_PAGE', 1 );
+define ( 'WPJSONFILTER_NOT_FOUND_MESSAGE', "Recurso não encontrado" );
 
 if ( is_admin() || ( defined( "WP_CLI" ) && WP_CLI ) ) {
 	// For customizitaion page in admin area
@@ -67,11 +48,6 @@ if ( defined( "WP_CLI" ) && WP_CLI ) {
 	// For customizitaion page via CLI interface
 }
 
-/*
-	SUGESTÃO
-	uma função que faz todos os add_actions de uma vez só.
-	Chamei essa função de endpointsFactory
-*/
 add_action( 'rest_api_init', function () {
   register_rest_route( 'wp-json-filter/v1', '/blog/(?P<ID>\d+)', array(
     'methods' => 'GET',
@@ -120,13 +96,12 @@ add_action( 'rest_api_init', function () {
     'callback' => 'idQueryRID',
   ) );
 } );
+
 /*
 	SUGESTÃO
 	É muito mais seguro e estável usar a interface de banco de dados do próprio WP.
 	Veja um exemplo de como fazer isso no arquivo functions.php (só mantive o arquivo para voce ver como usar a interface. Depois pode apagar.)
 */
-
-
 function idQuery( $data ) {
   $prefix = 'dev';
   $username = 'plugin';
@@ -162,12 +137,6 @@ function idQuery( $data ) {
   return $res;
 }
 
-// Para as funções que com instância PDO
-// mudar $pdo = new ...
-// para $pdo = getPDOInstance()
-//
-// function getPDOInstance () return new PDO ...
-//
 function idQueryR( $data ) {
   $maxPerPage = 1;
   $page = 1;
@@ -192,7 +161,7 @@ function idQueryR( $data ) {
     };
     $res[] = array(
       "status" => 200,
-      "pageSize"=> pageSize,
+      "pageSize"=> WPJSONFILTER_PAGE_SIZE,
       "page"=> $page,
       "data" => array (
       "id" => $response["comment_ID"],
@@ -253,7 +222,7 @@ function noIdQuery( $data ) {
     $treatedQuery = "";
   }
   $queryArgs = implode(", ",$treatedQuery);
-  $args = array( 'category_name' => 'dicas', 'numberposts' => pageSize, 'offset' => $postOffset, $queryArgs );
+  $args = array( 'category_name' => 'dicas', 'numberposts' => WPJSONFILTER_PAGE_SIZE, 'offset' => $postOffset, $queryArgs );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
     $post_ID = $posts->ID;
@@ -325,41 +294,48 @@ function noIdQueryC( $data ) {
 }
 
 function noIdQueryS( $data ) {
-  $page = $pageFromQueryParam ?? 1 ;
+	// ATENÇÃO!!! $pageFromQueryParam, $pageSize são NULL
+	// $page recebe valor padrão 1 e isso faz com que $postOffset se torne 0.
+  $page = $pageFromQueryParam ?? WPJSONFILTER_DEFAULT_PAGE ;
   $postOffset = $pageSize * ( $page - 1 );
-  $args = array( 'category_name' => 'Produto', 'numberposts' => pageSize, 'offset' => $postOffset    );
+
+  $args = array( 'category_name' => 'produto', 'numberposts' => WPJSONFILTER_PAGE_SIZE, 'offset' => $postOffset );
   $myposts = get_posts( $args );
-  foreach($myposts as $posts){
-    $post_ID = $posts->ID;
-    $tags = get_the_tags($post_ID);
-    $posts->tags = $tags;
-    $img = get_the_post_thumbnail_url( $post_ID );
-    $posts->img = $img;
-    $result[] = $posts;
-  };
-  foreach ($result as $response){
-    $nHashtag = $response->tags;
-    foreach ($nHashtag as $hashtags){
-      $tag[] = array(
-        "id" => $hashtags->term_id,
-        "name" => $hashtags->name
-      );
-    };
-    $res[] = array(
-      "status" => 200,
-      "pageSize"=> $args['numberposts'],
-      "page"=>  $args['offset'],
-      "data" => array (
-      "id" => $response->ID,
-      "date" => $response->post_date,
-      "content" => $response->post_content,
-      "title" => $response->post_title,
-      "name" => $response->post_name,
-      "excerpt" => $response->post_excerpt,
-      "img" => $response->img,
-      "hashtags" => $tag
-      )
-    );
+
+  if ( ! empty( $myposts ) )
+  {
+	  foreach($myposts as $post){
+		  foreach ( get_the_tags( $post->ID ) as $hashtag ){
+			  $tags[] = array(
+				  "id" => $hashtag->term_id,
+				  "name" => $hashtag->name
+			  );
+		  }
+		  $result[] = array (
+			  "id" => $post->ID,
+			  "date" => $post->post_date,
+			  "content" => $post->post_content,
+			  "title" => $post->post_title,
+			  "name" => $post->post_name,
+			  "excerpt" => $post->post_excerpt,
+			  "img" => get_the_post_thumbnail_url( $post->ID ),
+			  "tags" => $tags
+		  );
+	  };
+	  $res = array(
+		  "status" => 200,
+		  "pageSize"=> $args['numberposts'],
+		  "page"=>  $args['offset'],
+		  "data" => $result
+	  );
   }
+  else
+  {
+	  $res = array(
+		  "status" => 404,
+		  "message" => WPJSONFILTER_NOT_FOUND_MESSAGE
+	  );
+  }
+
   return $res;
 }
