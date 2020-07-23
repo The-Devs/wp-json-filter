@@ -243,7 +243,17 @@ function idQueryRID( $data ) {
 function noIdQuery( $data ) {
   $page = $pageFromQueryParam ?? 1 ;
   $postOffset = $pageSize * ( $page - 1 );
-  $args = array( 'category_name' => 'dicas', 'numberposts' => pageSize, 'offset' => $postOffset  );
+  $queryParams = explode("&",$_SERVER['QUERY_STRING']);
+  if($queryParams !== ""){
+    foreach($queryParams as $qParam){
+      $eQuery = explode("=", $qParam);
+      $treatedQuery[] = implode(" => ", $eQuery);
+    }
+  } else {
+    $treatedQuery = "";
+  }
+  $queryArgs = implode(", ",$treatedQuery);
+  $args = array( 'category_name' => 'dicas', 'numberposts' => pageSize, 'offset' => $postOffset, $queryArgs );
   $myposts = get_posts( $args );
   foreach($myposts as $posts){
     $post_ID = $posts->ID;
