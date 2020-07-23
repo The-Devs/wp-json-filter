@@ -67,10 +67,9 @@ Requisição POST para escrita na rota de comentários do post.
     data: [
       {
         id: int,
+        content: string,
         title: string,
         name: string,
-        img: string,
-        isMulti: bool,
         hashtags: [
           {
             id: int,
