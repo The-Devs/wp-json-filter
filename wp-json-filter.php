@@ -216,15 +216,25 @@ function noIdQuery( $data ) {
   if($queryParams !== ""){
     foreach($queryParams as $qParam){
       $eQuery = explode("=", $qParam);
-      $treatedQuery[] = implode(" => ", $eQuery);
     }
   } else {
-    $treatedQuery = "";
+    $eQuery = "";
   }
-  $queryArgs = implode(", ",$treatedQuery);
-  $args = array( 'category_name' => 'dicas', 'numberposts' => WPJSONFILTER_DEFAULT_PAGE_SIZE, 'offset' => $postOffset, $queryArgs );
-  $myposts = get_posts( $args );
-  foreach($myposts as $posts){
+  //$args = array( 'category_name' => 'dicas', 'numberposts' => WPJSONFILTER_DEFAULT_PAGE_SIZE, 'offset' => $postOffset, 'post_tags' => $eQuery[1]);
+  $args = array(array('posts_per_page=5', 'tag_id' => $eQuery[1], 'category_name'=> 'dicas' ));
+  $myposts = new WP_Query( $args );
+  if ( $myposts->have_posts() ) {
+    while ( $myposts->have_posts() ) {
+    $myposts->the_post();
+    }
+
+} else {
+    // no posts found
+}
+/* Restore original Post Data */
+wp_reset_postdata();
+return $myposts;
+  /* foreach($myposts as $posts){
     $post_ID = $posts->ID;
     $img = get_the_post_thumbnail_url( $post_ID );
     $tags = get_the_tags($post_ID);
@@ -256,7 +266,7 @@ function noIdQuery( $data ) {
       )
     );
   }
-  return $res;
+  return $args; */
 }
 
 function noIdQueryC( $data ) {
